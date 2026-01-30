@@ -33,33 +33,7 @@ export default defineConfig(async () => ({
   // Build optimizations
   build: {
     target: "esnext",
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // Split vendor libraries into separate chunks
-          if (id.includes("node_modules")) {
-            // React and related libraries
-            if (
-              id.includes("react") ||
-              id.includes("react-dom") ||
-              id.includes("scheduler")
-            ) {
-              return "react-vendor";
-            }
-            // Ant Design and related UI libraries
-            if (id.includes("antd") || id.includes("@ant-design")) {
-              return "antd-vendor";
-            }
-            // Tauri API
-            if (id.includes("@tauri-apps")) {
-              return "tauri-vendor";
-            }
-            // Return undefined for other vendors to let Rollup handle them
-            return undefined;
-          }
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1024,
+    rollupOptions: {},
+    chunkSizeWarningLimit: 2048,
   },
 }));
