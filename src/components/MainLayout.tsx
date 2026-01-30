@@ -94,6 +94,42 @@ const MainLayout = () => {
     };
   }, []); // 移除 addLog 依赖，防止重复注册监听器
 
+  // 监听原仓库域名和新仓库域名变化，更新列表中的匹配状态和新URL
+  useEffect(() => {
+    if (scanResult && !isScanning && !isReplacing) {
+      const updatedRepos = scanResult.repos.map((repo) => {
+        // 如果原仓库域名为空，则所有仓库都不匹配
+        if (!oldDomain) {
+          return {
+            ...repo,
+            matched: false,
+            newUrl: "",
+          };
+        }
+
+        // 检查是否匹配原仓库域名
+        const matched = repo.oldUrl.includes(oldDomain);
+
+        // 计算新URL
+        let newUrl = "";
+        if (matched && newDomain) {
+          newUrl = repo.oldUrl.replace(oldDomain, newDomain);
+        }
+
+        return {
+          ...repo,
+          matched,
+          newUrl,
+        };
+      });
+
+      setScanResult({
+        ...scanResult,
+        repos: updatedRepos,
+      });
+    }
+  }, [oldDomain, newDomain, isScanning, isReplacing]);
+
   const handleSelectDir = async () => {
     setIsSelectingDir(true);
     try {
@@ -312,7 +348,9 @@ const MainLayout = () => {
                   !scanResult ||
                   scanResult.repos.length === 0 ||
                   isReplacing ||
-                  isSelectingDir
+                  isSelectingDir ||
+                  !oldDomain ||
+                  !newDomain
                 }
                 className="action-btn replace-btn"
                 block
